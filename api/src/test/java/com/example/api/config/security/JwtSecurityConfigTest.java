@@ -25,19 +25,6 @@ class JwtSecurityConfigTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @TestConfiguration
-    static class TestControllerConfig {
-
-        @RestController
-        static class SecuredTestController {
-
-            @GetMapping("/secured/hello")
-            public void hello(HttpServletResponse response) {
-                response.setStatus(HttpServletResponse.SC_OK);
-            }
-        }
-    }
-
     @Test
     void shouldReturn401ForSecuredEndpointWithoutJwt() throws Exception {
         mockMvc.perform(get("/secured/hello"))
@@ -49,5 +36,18 @@ class JwtSecurityConfigTest {
         mockMvc.perform(get("/secured/hello")
                         .with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk());
+    }
+
+    @TestConfiguration
+    static class TestControllerConfig {
+
+        @RestController
+        static class SecuredTestController {
+
+            @GetMapping("/secured/hello")
+            public void hello(HttpServletResponse response) {
+                response.setStatus(HttpServletResponse.SC_OK);
+            }
+        }
     }
 }

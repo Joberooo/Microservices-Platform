@@ -68,7 +68,8 @@ flowchart LR
 
 ### 2.2 API Service
 
-**Tech stack:** Spring Boot, Spring WebFlux, Spring Security (OAuth2 Resource Server), WebClient, Resilience4j, springdoc-openapi
+**Tech stack:** Spring Boot, Spring WebFlux, Spring Security (OAuth2 Resource Server), WebClient, Resilience4j,
+springdoc-openapi
 
 **Responsibilities:**
 
@@ -566,5 +567,7 @@ mvn -pl common,api,product-service,gateway,eureka test
 
 ---
 
-This README is intended as a complete technical guide for running, understanding and extending the microservices platform.  
-Feel free to adapt, extend or integrate additional services while reusing the existing patterns for discovery, security, resilience and observability.
+This README is intended as a complete technical guide for running, understanding and extending the microservices
+platform.  
+Feel free to adapt, extend or integrate additional services while reusing the existing patterns for discovery, security,
+resilience and observability.

@@ -50,7 +50,7 @@ class ProductServiceTest {
 
         assertThat(result).isSameAs(response);
 
-        verify(productDbClient).getProducts(2, 25, criteria.sort(),  null, null);
+        verify(productDbClient).getProducts(2, 25, criteria.sort(), null, null);
     }
 
     @Test

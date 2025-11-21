@@ -36,7 +36,7 @@ public class IpRateLimiterFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange,
-            org.springframework.cloud.gateway.filter.GatewayFilterChain chain) {
+                             org.springframework.cloud.gateway.filter.GatewayFilterChain chain) {
         String ip = resolveClientIp(exchange.getRequest());
         TokenBucket bucket = buckets.computeIfAbsent(ip, k -> new TokenBucket(capacity, refillTokens, refillDuration));
 

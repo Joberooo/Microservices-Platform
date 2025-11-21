@@ -30,16 +30,13 @@ import static org.mockito.Mockito.when;
 )
 class ApiIntegrationTest {
 
+    private static final String JWT = createTestJwt();
     @Autowired
     WebTestClient webTestClient;
-
     @Autowired
     ObjectMapper objectMapper;
-
     @MockBean
     ProductDbClient productDbClient;
-
-    private static final String JWT = createTestJwt();
 
     private ProductDto sampleProduct() {
         ProductDto dto = new ProductDto();
@@ -90,7 +87,7 @@ class ApiIntegrationTest {
                 .jsonPath("$.content[0].name").isEqualTo("Sample");
 
         ArgumentCaptor<Integer> page = ArgumentCaptor.forClass(Integer.class);
-        verify(productDbClient).getProducts(page.capture(), anyInt(), anyList(),  isNull(), isNull());
+        verify(productDbClient).getProducts(page.capture(), anyInt(), anyList(), isNull(), isNull());
         assertThat(page.getValue()).isEqualTo(0);
     }
 

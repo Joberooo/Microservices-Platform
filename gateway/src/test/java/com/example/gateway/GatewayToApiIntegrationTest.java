@@ -32,19 +32,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 )
 class GatewayToApiIntegrationTest {
 
-    private static MockWebServer apiServer;
-
     private static final String RESPONSE_BODY = """
-                {
-                  "content": [],
-                  "pageNumber": 0,
-                  "pageSize": 10,
-                  "totalElements": 0,
-                  "totalPages": 0,
-                  "last": true
-                }
-                """;
-
+            {
+              "content": [],
+              "pageNumber": 0,
+              "pageSize": 10,
+              "totalElements": 0,
+              "totalPages": 0,
+              "last": true
+            }
+            """;
+    private static MockWebServer apiServer;
     @Autowired
     private WebTestClient webTestClient;
 
@@ -99,7 +97,7 @@ class GatewayToApiIntegrationTest {
     }
 
     @Test
-    void shouldReturn429WhenRateLimitExceeded(){
+    void shouldReturn429WhenRateLimitExceeded() {
         String clientIp = "203.0.113.10";
 
         int before = apiServer.getRequestCount();

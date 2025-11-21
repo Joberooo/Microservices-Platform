@@ -24,6 +24,30 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ProductDbClientTest {
 
+    @NotNull
+    private static ExchangeFunction getExchangeFunction(ApiErrorResponse apiError) {
+        String json = """
+                {
+                  "timestamp": "%s",
+                  "status": 404,
+                  "error": "Not Found",
+                  "message": "Product not found",
+                  "path": "/products/42",
+                  "correlationId": "cid-err-123",
+                  "fieldErrors": null
+                }
+                """.formatted(apiError.timestamp().toString());
+
+        return request -> {
+            ClientResponse response = ClientResponse
+                    .create(HttpStatus.NOT_FOUND)
+                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .body(json)
+                    .build();
+            return Mono.just(response);
+        };
+    }
+
     @AfterEach
     void clearMdc() {
         MDC.clear();
@@ -95,15 +119,15 @@ class ProductDbClientTest {
             capturedRequest.set(request);
 
             String json = """
-                {
-                  "content": [],
-                  "pageNumber": 0,
-                  "pageSize": 10,
-                  "totalElements": 0,
-                  "totalPages": 0,
-                  "last": true
-                }
-                """;
+                    {
+                      "content": [],
+                      "pageNumber": 0,
+                      "pageSize": 10,
+                      "totalElements": 0,
+                      "totalPages": 0,
+                      "last": true
+                    }
+                    """;
 
             ClientResponse response = ClientResponse
                     .create(HttpStatus.OK)
@@ -136,29 +160,5 @@ class ProductDbClientTest {
         assertThat(query).contains("sort=name,desc");
         assertThat(query).contains("name=chair");
         assertThat(query).contains("category=Electronics");
-    }
-
-    @NotNull
-    private static ExchangeFunction getExchangeFunction(ApiErrorResponse apiError) {
-        String json = """
-                {
-                  "timestamp": "%s",
-                  "status": 404,
-                  "error": "Not Found",
-                  "message": "Product not found",
-                  "path": "/products/42",
-                  "correlationId": "cid-err-123",
-                  "fieldErrors": null
-                }
-                """.formatted(apiError.timestamp().toString());
-
-        return request -> {
-            ClientResponse response = ClientResponse
-                    .create(HttpStatus.NOT_FOUND)
-                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .body(json)
-                    .build();
-            return Mono.just(response);
-        };
     }
 }

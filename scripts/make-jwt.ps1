@@ -1,20 +1,33 @@
 param(
-  [string]$Secret,
-  [string]$Sub,
-  [int]$ExpiresInSeconds
+    [string]$Secret,
+    [string]$Sub,
+    [int]$ExpiresInSeconds
 )
 
 $ErrorActionPreference = "Stop"
 
-if (-not $Secret) { $Secret = $env:JWT_SECRET }
-if (-not $Sub) { $Sub = "tester" }
-if (-not $ExpiresInSeconds) { $ExpiresInSeconds = 3600 }
-if (-not $Secret) { Write-Error "Provide -Secret or set JWT_SECRET env var." }
+if (-not $Secret)
+{
+    $Secret = $env:JWT_SECRET
+}
+if (-not $Sub)
+{
+    $Sub = "tester"
+}
+if (-not $ExpiresInSeconds)
+{
+    $ExpiresInSeconds = 3600
+}
+if (-not $Secret)
+{
+    Write-Error "Provide -Secret or set JWT_SECRET env var."
+}
 
-function b64url([byte[]]$bytes) {
-  $s = [System.Convert]::ToBase64String($bytes)
-  $s = $s.TrimEnd('=') -replace '\+','-' -replace '/','_'
-  return $s
+function b64url([byte[]]$bytes)
+{
+    $s = [System.Convert]::ToBase64String($bytes)
+    $s = $s.TrimEnd('=') -replace '\+', '-' -replace '/', '_'
+    return $s
 }
 
 $headerObj = @{ alg = "HS256"; typ = "JWT" }

@@ -30,6 +30,21 @@ class ChaosControllerSecurityTest {
     @Autowired
     private ProductDbClient productDbClient;
 
+    @Test
+    void shouldReturn401WithoutJwt() throws Exception {
+        mockMvc.perform(get("/dev/chaos"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void shouldReturn200WithValidJwt() throws Exception {
+        mockMvc.perform(
+                        get("/dev/chaos")
+                                .with(SecurityMockMvcRequestPostProcessors.jwt())
+                )
+                .andExpect(status().isOk());
+    }
+
     @TestConfiguration
     static class TestConfig {
 
@@ -45,20 +60,5 @@ class ChaosControllerSecurityTest {
         ChaosController chaosController(ProductDbClient client) {
             return new ChaosController(client);
         }
-    }
-
-    @Test
-    void shouldReturn401WithoutJwt() throws Exception {
-        mockMvc.perform(get("/dev/chaos"))
-                .andExpect(status().isUnauthorized());
-    }
-
-    @Test
-    void shouldReturn200WithValidJwt() throws Exception {
-        mockMvc.perform(
-                        get("/dev/chaos")
-                                .with(SecurityMockMvcRequestPostProcessors.jwt())
-                )
-                .andExpect(status().isOk());
     }
 }
