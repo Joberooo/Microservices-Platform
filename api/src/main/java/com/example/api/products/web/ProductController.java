@@ -1,9 +1,9 @@
 package com.example.api.products.web;
 
 import com.example.api.products.application.ProductService;
-import com.example.api.products.dto.PageResponse;
 import com.example.api.products.dto.ProductDto;
 import com.example.api.products.dto.ProductSearchCriteria;
+import com.example.common.product.dto.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;

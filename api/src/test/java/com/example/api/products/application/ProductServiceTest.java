@@ -1,9 +1,9 @@
 package com.example.api.products.application;
 
 import com.example.api.products.client.ProductDbClient;
-import com.example.api.products.dto.PageResponse;
 import com.example.api.products.dto.ProductDto;
 import com.example.api.products.dto.ProductSearchCriteria;
+import com.example.common.product.dto.PageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;

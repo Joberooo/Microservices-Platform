@@ -3,6 +3,9 @@ package com.example.db.product.application;
 import com.example.db.exceptions.ProductNotFoundException;
 import com.example.db.product.domain.Product;
 import com.example.db.product.domain.ProductRepository;
+import com.example.db.product.dto.ProductCreateRequest;
+import com.example.db.product.dto.ProductUpdateRequest;
+import com.example.db.product.mapper.ProductMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -45,21 +48,17 @@ public class ProductService {
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
-    public Product createProduct(Product product) {
-        return productRepository.save(product);
+    public Product createProduct(ProductCreateRequest request) {
+        return productRepository.save(ProductMapper.toEntity(request));
     }
 
-    public Product updateProduct(Product product) {
-        if (!productRepository.existsById(product.getId())) {
-            throw new ProductNotFoundException(product.getId());
-        }
+    public Product updateProduct(Long id, ProductUpdateRequest request) {
+        Product product = getProduct(id);
+        ProductMapper.updateEntity(product, request);
         return productRepository.save(product);
     }
 
     public void deleteProduct(Long id) {
-        if (!productRepository.existsById(id)) {
-            throw new ProductNotFoundException(id);
-        }
         productRepository.deleteById(id);
     }
 

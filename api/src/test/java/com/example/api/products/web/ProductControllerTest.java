@@ -1,9 +1,9 @@
 package com.example.api.products.web;
 
 import com.example.api.products.application.ProductService;
-import com.example.api.products.dto.PageResponse;
 import com.example.api.products.dto.ProductDto;
 import com.example.api.products.dto.ProductSearchCriteria;
+import com.example.common.product.dto.PageResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;

@@ -1,15 +1,13 @@
 package com.example.db.product.web;
 
+import com.example.common.product.dto.PageResponse;
 import com.example.db.product.application.ProductService;
-import com.example.db.product.domain.Product;
-import com.example.db.product.dto.PageResponse;
 import com.example.db.product.dto.ProductCreateRequest;
 import com.example.db.product.dto.ProductResponseDto;
 import com.example.db.product.dto.ProductUpdateRequest;
 import com.example.db.product.mapper.ProductMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,21 +29,23 @@ public class ProductController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String category
     ) {
-        Page<Product> products = productService.getProducts(page, size, sortParams, name, category);
-        return toDtoPage(products);
+        return toDtoPage(
+                productService.getProducts(page, size, sortParams, name, category)
+        );
     }
 
     @GetMapping("/{id}")
     public ProductResponseDto getProduct(@PathVariable Long id) {
-        Product product = productService.getProduct(id);
-        return ProductMapper.toDto(product);
+        return ProductMapper.toDto(
+                productService.getProduct(id)
+        );
     }
 
     @PostMapping
     public ProductResponseDto createProduct(@Valid @RequestBody ProductCreateRequest request) {
-        Product toSave = ProductMapper.toEntity(request);
-        Product saved = productService.createProduct(toSave);
-        return ProductMapper.toDto(saved);
+        return ProductMapper.toDto(
+                productService.createProduct(request)
+        );
     }
 
     @PutMapping("/{id}")
@@ -53,10 +53,9 @@ public class ProductController {
             @PathVariable Long id,
             @Valid @RequestBody ProductUpdateRequest request
     ) {
-        Product existing = productService.getProduct(id);
-        ProductMapper.updateEntity(existing, request);
-        Product updated = productService.updateProduct(existing);
-        return ProductMapper.toDto(updated);
+        return ProductMapper.toDto(
+                productService.updateProduct(id, request)
+        );
     }
 
     @DeleteMapping("/{id}")

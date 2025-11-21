@@ -1,5 +1,6 @@
 package com.example.api.products.dto;
 
+import com.example.common.product.dto.PageResponse;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

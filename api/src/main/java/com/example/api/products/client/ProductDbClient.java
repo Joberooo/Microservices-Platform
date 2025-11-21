@@ -1,9 +1,9 @@
 package com.example.api.products.client;
 
-import com.example.api.products.dto.PageResponse;
 import com.example.api.products.dto.ProductDto;
 import com.example.common.CorrelationIdConstants;
 import com.example.common.error.ApiErrorResponse;
+import com.example.common.product.dto.PageResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;

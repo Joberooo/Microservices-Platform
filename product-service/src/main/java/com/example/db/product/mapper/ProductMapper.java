@@ -1,7 +1,7 @@
 package com.example.db.product.mapper;
 
+import com.example.common.product.dto.PageResponse;
 import com.example.db.product.domain.Product;
-import com.example.db.product.dto.PageResponse;
 import com.example.db.product.dto.ProductCreateRequest;
 import com.example.db.product.dto.ProductResponseDto;
 import com.example.db.product.dto.ProductUpdateRequest;
