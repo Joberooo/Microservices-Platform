@@ -78,7 +78,7 @@ GATEWAY_RL_REFILL_DURATION=10s
 - Adjust rate limiting parameters as needed (capacity, refill tokens, interval).
 - `GATEWAY_PORT` controls the port exposed on the host.
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -148,7 +148,7 @@ http://localhost:8080
 docker compose down -v
 ```
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -182,7 +182,7 @@ Use the token in requests:
 Authorization: Bearer <token>
 ```
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -226,7 +226,7 @@ flowchart LR
 - **API** and **Product Service** are reachable only on the internal Docker network.
 - All inter-service communication uses **service names** (via Eureka + LoadBalancer), not raw host/port.
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -346,7 +346,7 @@ Shared module used by API and Product services:
     - Stores the ID in MDC and sends it back in response header
 - `ApiErrorResponse` + `ValidationErrorDetails` – unified error payloads
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -379,7 +379,7 @@ The project is a multi-module Maven build. Modules live directly in the reposito
 └── README.md
 ```
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -476,7 +476,7 @@ Delete:
 curl.exe -X DELETE -H $AUTH "$BASE/api/products/1"
 ```
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -516,7 +516,7 @@ Observe:
 - Logs in API for retries and circuit breaker state changes
 - Error responses when downstream failures are simulated
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -552,7 +552,7 @@ You should see the same `demo-corr-123` in:
 - Response header `X-Correlation-ID`
 - Logs of API and Product Service
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -598,7 +598,7 @@ done
 
 You should see some `429` responses once your capacity is exhausted.
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -676,7 +676,7 @@ mvn -pl common,api,product-service,gateway,eureka test
 
 - Basic context load tests
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
@@ -723,7 +723,7 @@ mvn -pl common,api,product-service,gateway,eureka test
 - Inspect logs for `api` and `product-service` for exceptions.
 - Ensure Docker networks are up and containers can resolve each other by service name.
 
-<p style="text-align:right">
+<p align="right">
   <a href="#table-of-contents" style="
       background:#0366d6;
       color:white;
