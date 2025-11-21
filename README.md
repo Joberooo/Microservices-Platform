@@ -16,9 +16,188 @@ It demonstrates:
 
 ---
 
-## 1. Architecture
+## Table of Contents
+- [1. Configuration & Environment](#1-configuration--environment)
+    - [1.1 .env file](#11-env-file)
+- [2. Building & Running](#2-building--running)
+    - [2.1 Prerequisites](#21-prerequisites)
+    - [2.2 Build Docker Images](#22-build-docker-images)
+    - [2.3 Start the Stack](#23-start-the-stack)
+    - [2.4 Stop & Clean Up](#24-stop--clean-up)
+- [3. JWT Authentication](#3-jwt-authentication)
+    - [3.1 Generate a Token (PowerShell)](#31-generate-a-token-powershell)
+- [4. Architecture](#4-architecture)
+    - [4.1 High-level Diagram](#41-high-level-diagram)
+- [5. Services](#5-services)
+    - [5.1 Gateway](#51-gateway)
+    - [5.2 API Service](#52-api-service)
+    - [5.3 Product Service](#53-product-service)
+    - [5.4 Eureka](#54-eureka)
+    - [5.5 Common Module](#55-common-module)
+- [6. Project Layout](#6-project-layout)
+- [7. API Usage](#7-api-usage)
+    - [7.1 Swagger UI](#71-swagger-ui)
+    - [7.2 Example Requests (PowerShell + curl.exe)](#72-example-requests-powershell--curlexe)
+        - [7.2.1 List Products](#721-list-products)
+        - [7.2.2 Filtering](#722-filtering)
+        - [7.2.3 Create / Get / Update / Delete](#723-create--get--update--delete)
+- [8. Chaos & Resilience](#8-chaos--resilience)
+    - [8.1 Chaos Endpoint](#81-chaos-endpoint)
+- [9. Correlation IDs](#9-correlation-ids)
+- [10. Rate Limiting](#10-rate-limiting)
+- [11. Testing](#11-testing)
+    - [11.1 Smoke Test Script](#111-smoke-test-script)
+    - [11.2 Maven Tests](#112-maven-tests)
+- [12. Troubleshooting](#12-troubleshooting)
 
-### 1.1 High-level Diagram
+---
+
+## 1. Configuration & Environment
+
+### 1.1 `.env` file
+
+Create `.env` in the project root:
+
+```bash
+cp .env.example .env
+```
+
+Default variables:
+
+```env
+JWT_SECRET=dev-secret-32-bytes-minimum-key-please!
+GATEWAY_PORT=8080
+GATEWAY_RL_CAPACITY=20
+GATEWAY_RL_REFILL_TOKENS=20
+GATEWAY_RL_REFILL_DURATION=10s
+```
+
+**Notes:**
+
+- `JWT_SECRET` must be at least **32 bytes** for HS256.
+- Adjust rate limiting parameters as needed (capacity, refill tokens, interval).
+- `GATEWAY_PORT` controls the port exposed on the host.
+
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
+
+---
+
+## 2. Building & Running
+
+### 2.1 Prerequisites
+
+- Docker Desktop (or compatible engine) with Docker Compose
+- Java toolchain only required for local Maven build (not for Docker-only usage)
+- Optional: PowerShell 5.1+ or 7+ for helper scripts
+
+### 2.2 Build Docker Images
+
+From repository root:
+
+```bash
+docker compose build
+```
+
+Each service has its own multi-stage Dockerfile:
+
+- Build stage: Maven build and tests
+- Runtime stage:
+    - Minimal JRE image
+    - Non-root user
+    - HEALTHCHECK
+
+### 2.3 Start the Stack
+
+```bash
+docker compose up -d
+```
+
+Check container status:
+
+```bash
+docker compose ps
+```
+
+Typical state:
+
+- `gateway` – healthy
+- `api` – healthy
+- `product-service` – healthy
+- `eureka` – healthy
+
+Gateway will be reachable at:
+
+```text
+http://localhost:8080
+```
+
+> API and Product Service ports are **not** published to the host and are only accessible via gateway.
+
+### 2.4 Stop & Clean Up
+
+```bash
+docker compose down -v
+```
+
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
+
+---
+
+## 3. JWT Authentication
+
+The API service works as a JWT **resource server** with HMAC-SHA256 (HS256).  
+The signing key is taken from `JWT_SECRET`.
+
+### 3.1 Generate a Token (PowerShell)
+
+From the repository root:
+
+```powershell
+$env:JWT_SECRET = "dev-secret-32-bytes-minimum-key-please!"
+$TOKEN = ./scripts/make-jwt.ps1
+$TOKEN | Set-Clipboard
+```
+
+Use the token in requests:
+
+```http
+Authorization: Bearer <token>
+```
+
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
+
+---
+
+## 4. Architecture
+
+### 4.1 High-level Diagram
 
 ```mermaid
 flowchart LR
@@ -47,11 +226,22 @@ flowchart LR
 - **API** and **Product Service** are reachable only on the internal Docker network.
 - All inter-service communication uses **service names** (via Eureka + LoadBalancer), not raw host/port.
 
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
+
 ---
 
-## 2. Services
+## 5. Services
 
-### 2.1 Gateway
+### 5.1 Gateway
 
 **Tech stack:** Spring Cloud Gateway, Spring Boot, Actuator
 
@@ -66,7 +256,7 @@ flowchart LR
 
 ---
 
-### 2.2 API Service
+### 5.2 API Service
 
 **Tech stack:** Spring Boot, Spring WebFlux, Spring Security (OAuth2 Resource Server), WebClient, Resilience4j,
 springdoc-openapi
@@ -104,7 +294,7 @@ All these endpoints expect a valid JWT (except Swagger/OpenAPI & health/info, wh
 
 ---
 
-### 2.3 Product Service
+### 5.3 Product Service
 
 **Tech stack:** Spring Boot, Spring MVC, Spring Data JPA, H2, Flyway
 
@@ -134,7 +324,7 @@ All these endpoints expect a valid JWT (except Swagger/OpenAPI & health/info, wh
 
 ---
 
-### 2.4 Eureka
+### 5.4 Eureka
 
 **Tech stack:** Spring Cloud Netflix Eureka Server
 
@@ -146,7 +336,7 @@ All these endpoints expect a valid JWT (except Swagger/OpenAPI & health/info, wh
 
 ---
 
-### 2.5 Common Module
+### 5.5 Common Module
 
 Shared module used by API and Product services:
 
@@ -156,9 +346,20 @@ Shared module used by API and Product services:
     - Stores the ID in MDC and sends it back in response header
 - `ApiErrorResponse` + `ValidationErrorDetails` – unified error payloads
 
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
+
 ---
 
-## 3. Project Layout
+## 6. Project Layout
 
 The project is a multi-module Maven build. Modules live directly in the repository root:
 
@@ -178,115 +379,16 @@ The project is a multi-module Maven build. Modules live directly in the reposito
 └── README.md
 ```
 
----
-
-## 4. Configuration & Environment
-
-### 4.1 `.env` file
-
-Create `.env` in the project root:
-
-```bash
-cp .env.example .env
-```
-
-Default variables:
-
-```env
-JWT_SECRET=dev-secret-32-bytes-minimum-key-please!
-GATEWAY_PORT=8080
-GATEWAY_RL_CAPACITY=20
-GATEWAY_RL_REFILL_TOKENS=20
-GATEWAY_RL_REFILL_DURATION=10s
-```
-
-**Notes:**
-
-- `JWT_SECRET` must be at least **32 bytes** for HS256.
-- Adjust rate limiting parameters as needed (capacity, refill tokens, interval).
-- `GATEWAY_PORT` controls the port exposed on the host.
-
----
-
-## 5. Building & Running
-
-### 5.1 Prerequisites
-
-- Docker Desktop (or compatible engine) with Docker Compose
-- Java toolchain only required for local Maven build (not for Docker-only usage)
-- Optional: PowerShell 5.1+ or 7+ for helper scripts
-
-### 5.2 Build Docker Images
-
-From repository root:
-
-```bash
-docker compose build
-```
-
-Each service has its own multi-stage Dockerfile:
-
-- Build stage: Maven build and tests
-- Runtime stage:
-    - Minimal JRE image
-    - Non-root user
-    - HEALTHCHECK
-
-### 5.3 Start the Stack
-
-```bash
-docker compose up -d
-```
-
-Check container status:
-
-```bash
-docker compose ps
-```
-
-Typical state:
-
-- `gateway` – healthy
-- `api` – healthy
-- `product-service` – healthy
-- `eureka` – healthy
-
-Gateway will be reachable at:
-
-```text
-http://localhost:8080
-```
-
-> API and Product Service ports are **not** published to the host and are only accessible via gateway.
-
-### 5.4 Stop & Clean Up
-
-```bash
-docker compose down -v
-```
-
----
-
-## 6. JWT Authentication
-
-The API service works as a JWT **resource server** with HMAC-SHA256 (HS256).  
-The signing key is taken from `JWT_SECRET`.
-
-### 6.1 Generate a Token (PowerShell)
-
-From the repository root:
-
-```powershell
-$env:JWT_SECRET = "dev-secret-32-bytes-minimum-key-please!"
-$TOKEN = ./scripts/make-jwt.ps1
-$TOKEN | Set-Clipboard
-```
-
-Use the token in requests:
-
-```http
-Authorization: Bearer <token>
-```
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
 
 ---
 
@@ -320,7 +422,8 @@ $TOKEN = ./scripts/make-jwt.ps1
 $AUTH = "Authorization: Bearer $TOKEN"
 ```
 
-#### 7.2.1 List Products (paging + sorting)
+#### 7.2.1 List Products
+*(with paging + sorting)*
 
 ```powershell
 curl.exe -H $AUTH `
@@ -373,6 +476,17 @@ Delete:
 curl.exe -X DELETE -H $AUTH "$BASE/api/products/1"
 ```
 
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
+
 ---
 
 ## 8. Chaos & Resilience
@@ -402,6 +516,17 @@ Observe:
 - Logs in API for retries and circuit breaker state changes
 - Error responses when downstream failures are simulated
 
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
+
 ---
 
 ## 9. Correlation IDs
@@ -426,6 +551,17 @@ You should see the same `demo-corr-123` in:
 
 - Response header `X-Correlation-ID`
 - Logs of API and Product Service
+
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
 
 ---
 
@@ -461,6 +597,17 @@ done
 ```
 
 You should see some `429` responses once your capacity is exhausted.
+
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
 
 ---
 
@@ -529,6 +676,17 @@ mvn -pl common,api,product-service,gateway,eureka test
 
 - Basic context load tests
 
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
+
 ---
 
 ## 12. Troubleshooting
@@ -564,6 +722,17 @@ mvn -pl common,api,product-service,gateway,eureka test
 - Check Eureka status and registrations.
 - Inspect logs for `api` and `product-service` for exceptions.
 - Ensure Docker networks are up and containers can resolve each other by service name.
+
+<p style="text-align:right">
+  <a href="#table-of-contents" style="
+      background:#0366d6;
+      color:white;
+      padding:6px 12px;
+      border-radius:6px;
+      text-decoration:none;">
+    ⬆ Back to Table of Contents
+  </a>
+</p>
 
 ---
 
