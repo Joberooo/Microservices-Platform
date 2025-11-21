@@ -2,7 +2,10 @@ package com.example.db.product.web;
 
 import com.example.db.product.application.ProductService;
 import com.example.db.product.domain.Product;
-import com.example.db.product.dto.*;
+import com.example.db.product.dto.PageResponse;
+import com.example.db.product.dto.ProductCreateRequest;
+import com.example.db.product.dto.ProductResponseDto;
+import com.example.db.product.dto.ProductUpdateRequest;
 import com.example.db.product.mapper.ProductMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

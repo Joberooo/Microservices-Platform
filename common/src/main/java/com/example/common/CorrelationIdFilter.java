@@ -10,7 +10,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.UUID;
 
-import static com.example.common.CorrelationIdConstants.*;
+import static com.example.common.CorrelationIdConstants.HEADER_NAME;
+import static com.example.common.CorrelationIdConstants.MDC_KEY;
 
 public class CorrelationIdFilter extends OncePerRequestFilter {
 
