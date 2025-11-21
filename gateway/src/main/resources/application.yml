@@ -1,0 +1,56 @@
+server:
+  port: ${GATEWAY_PORT:8080}
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: api-service
+              uri: lb://api-service
+              predicates:
+                - Path=/api/**
+              filters:
+                - StripPrefix=1
+            - id: api-swagger
+              uri: lb://api-service
+              predicates:
+                - Path=/swagger-ui/**,/swagger-ui.html,/v3/api-docs,/v3/api-docs/**
+          discovery:
+            locator:
+              enabled: false
+      # default-filters can be added here if needed
+    loadbalancer:
+      retry:
+        enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+    filterOnlyUpInstances: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: INFO
+
+rate-limit:
+  capacity: ${GATEWAY_RL_CAPACITY:20}
+  refill-tokens: ${GATEWAY_RL_REFILL_TOKENS:20}
+  refill-duration: ${GATEWAY_RL_REFILL_DURATION:1s}
